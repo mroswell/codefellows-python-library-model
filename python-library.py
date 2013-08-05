@@ -7,10 +7,12 @@ class Library:
         >>>
         """
         self.lib_name = lib_name
+        self.unshelf_rack = Shelf(".Unshelved.")
 
         # Every library starts with a set of shelves
         # shelves -> [ ShelfObject1, ShelfObject2 ... ]
         self.shelves=[]
+        self.shelves.append(self.unshelf_rack)
 
         # set up the library shelves
         for i in shelf_names:
@@ -55,13 +57,16 @@ class Shelf:
 class Book:
     """ A Book"""
 
-    def __init__(self, book_ID, book_name):
+    # every book knows which library it belongs to
+
+    def __init__(self, book_ID, book_name, mylib):
         """  (Book, str,str) -> NoneType
         >>> Book = Book('N10','Raw Food Made Easy') 
         >>>
         """
         self.book_ID=book_ID
         self.book_name = book_name
+        self.library=mylib
 
     # Book objects have "enshelf" and "unshelf" methods to control what shelf the book is sitting on. 
     def enshelf(self, shelf):
@@ -70,14 +75,19 @@ class Book:
         >>>
         """
         shelf.books.append(self)
+        # print 'Book  %s -> (%s)' %(self.book_name, shelf.shelf_name)
 
 
     def unshelf(self, current_shelf):
         """  (Book, Shelf) -> NoneType
         book1.unshelf(nutrition_shelf)
         """
-        
+
+        # remove from current shelf
         current_shelf.books.remove(self)
+
+        # move to .Unshelved. rack
+        self.enshelf(self.library.unshelf_rack)
 
 
 
@@ -85,23 +95,23 @@ if __name__ == '__main__':
 
     # Create library and shelves
     library1=Library("Old Alexandria")
-    nutrition_shelf=library1.shelves[0]
-    travel_shelf=library1.shelves[1]
+    nutrition_shelf=library1.shelves[1]
+    travel_shelf=library1.shelves[2]
     cookbook_shelf = Shelf("Cookbooks")
     library1.add_shelf(cookbook_shelf)
 
     # Add books, and enshelf them.
-    bookN001=Book("N10", "Raw Food Made Easy")
-    bookN001.enshelf(cookbook_shelf)
-    bookN002=Book("N11", "Eat Crops, Not Crap")
-    bookN002.enshelf(nutrition_shelf)
-    bookT101=Book("T20", "Your Guide to Greece")
-    bookT101.enshelf(travel_shelf)
-    bookT102=Book("T21", "Rome in a Day")
-    bookT102.enshelf(travel_shelf)
+    bookN101=Book("N10", "Raw Food Made Easy", library1)
+    bookN101.enshelf(cookbook_shelf)
+    bookN102=Book("N11", "Eat Crops, Not Crap", library1)
+    bookN102.enshelf(nutrition_shelf)
+    bookT201=Book("T20", "Your Guide to Greece", library1)
+    bookT201.enshelf(travel_shelf)
+    bookT202=Book("T21", "Rome in a Day", library1)
+    bookT202.enshelf(travel_shelf)
 
     # Unshelf a book whose title is not acceptable for children
-    bookN002.unshelf(nutrition_shelf) 
+    bookN102.unshelf(nutrition_shelf) 
 
     # List the books 
     library1.list_books()
@@ -116,8 +126,7 @@ if __name__ == '__main__':
     
 
 # TODO:
-    # Modify unshelf method to set the shelf to "unshelved" to ensure that the book displays in the list_books() function
-    #   (Currently unshelved books do not get printed.)
+    # DONE. Modify unshelf method to set the shelf to "unshelved" to ensure that the book displays in the list_books() function
     # I'd also prefer a way to unshelf without having to know the existing shelf.
     # Set shelf during the book instantiation
     
